@@ -16,10 +16,10 @@ jobs:
         with:
           gradle-version: '8.2'
       - uses: android-actions/setup-android@v2
-      - run: unzip -o BisikChat-FINAL.zip -d extracted
+      - run: unzip -o BisikChat-v2-fixed.zip -d extracted
       - run: |
           cd extracted
-          unzip -o BisikChat-v2.zip
+          unzip -o BisikChat-v2-fixed.zip
           cd BisikChat
           gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
