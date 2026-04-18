@@ -12,18 +12,23 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: '8.2'
-      - uses: android-actions/setup-android@v2
-      - run: unzip -o BisikChat-UPLOAD2.zip -d extracted
-        - run: |
-          ls extracted/
-          unzip -o extracted/BisikChat-v2-fixed.zip -d project
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager "build-tools;33.0.2" "platforms;android-33"
+      - run: ls -la
+      - name: Extract ZIP
+        run: |
+          ZIP=$(ls *.zip | head -1)
+          echo "ZIP=$ZIP"
+          unzip -o "$ZIP" -d project
           ls project/
-      - run: chmod +x project/gradlew
-      - run: cd project && ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Find project
+        run: |
+          GRADLEW=$(find project -name "gradlew" | head -1)
+          echo "PROJ_DIR=$(dirname $GRADLEW)" >> $GITHUB_ENV
+      - run: chmod +x ${{ env.PROJ_DIR }}/gradlew
+      - run: cd ${{ env.PROJ_DIR }} && ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: BisikChat-APK
-          path: extracted/BisikChat/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/*.apk"
+          if-no-files-found: error
